@@ -26,7 +26,7 @@ target_link_libraries(hello_raylib PRIVATE raylib)
 
 # target / project (2):
 
-add_executable(sandels src_testing/sandels.cpp)
+add_executable(sandels src_sandels/sandels.cpp)
 target_link_libraries(sandels PRIVATE raylib)
 
 
