@@ -18,8 +18,8 @@ using namespace std;
 struct Sandel
 { // '{}' automatically assigns default empty values
     Vector2 pos {};
-    float velocity {};
-    float life {};
+    float velocity {1.0f};
+    float life {1.0f};
 };
 
 
@@ -42,7 +42,7 @@ int main()
     vector<Sandel> sandels;
     sandels.reserve(1024);
 
-    // IMPLEMENT ON YOUR OWN!!! // seed random number generator
+    // TODO: IMPLEMENT ON YOUR OWN!!! // seed random number generator
 
     // main game loop
     while (!WindowShouldClose())
@@ -52,41 +52,43 @@ int main()
         Vector2 mousePosition = GetMousePosition();
 
         if (IsMouseButtonDown(MOUSE_BUTTON_LEFT))
-        { // TODO: fix last sandle being fucking weirdly longer?
-            // cout << "DEBUG: " "Mouse [X: " << mousePosition.x << ", " << "Y: " << mousePosition.y << ']' << endl; // debug
+        {
+            //cout << "DEBUG: " "Mouse [X: " << mousePosition.x << ", " << "Y: " << mousePosition.y << ']' << endl; // DEBUG
+            // TODO: combine into one push_back if possible for performance maybe
+            sandels.push_back(Sandel(mousePosition));
+            sandels.push_back(Sandel({mousePosition.x - 13, mousePosition.y}));
+            sandels.push_back(Sandel({mousePosition.x + 13, mousePosition.y}));
 
-            sandels.push_back(Sandel({mousePosition.x - 3, mousePosition.y}, 1.0f, 1.0f));
-            sandels.push_back(Sandel(mousePosition, 1.0f, 1.0f));
-            sandels.push_back(Sandel({mousePosition.x + 3, mousePosition.y}, 1.0f, 1.0f));
         }
 
-        int sandle_inter = 0;
-        // TODO: fix this the last sandle being fucking weird?
-        for (Sandel &sndl: sandels) // direct reference with '&', Sandel& and &sndl have same effect
+        for (size_t sandle_inter = 0; sandle_inter < sandels.size();) // direct reference with '&', Sandel& and &sndl have same effect
         {
-            // cout << "DEBUG: " "[Sandel: " << sandle_inter << ", X: " << sndl.pos.x << ", Y: " << sndl.pos.y << ", Life: " << sndl.life << ']' << endl; // debug
-
-            sndl.life -= 0.004;
-            sndl.pos.y += 4;
-            // IMPLEMENT ON YOUR OWN!!! // random -1 or +1
-
-            if (sndl.life <= 0.0001f)
+            Sandel &sndl = sandels[sandle_inter];
+            //cout << "DEBUG: " "[Iteration: " << sandle_inter << ", X: " << sndl.pos.x << ", Y: " << sndl.pos.y << ", Life: " << sndl.life << ']' << endl; // DEBUG
+                if (sndl.life <= 0.0001f)
             {
-                sandels.erase(sandels.begin() + sandle_inter); // weird accurate maybe
+                sandels.erase(sandels.begin() + sandle_inter); // weird accurate ig
+                // line above deletes the sandel with 0 life left,
+                // lines under delete the first sandel created when any sandel reaches 0 life,
+                // making the above line more accurate if sandel life and spawn order
+                // stops being the same, since now oldest sandel has least health
                 //sandels.erase(sandels.begin()); // weird simpler faster
-                //sandels.erase(begin(sandels)); // same weird simple fast
+                //sandels.erase(begin(sandels)); // same weird simple fast, whats diff
             } else {
-                // only increment iterator if nothing is removed from vector to avoid having the iterator shift, since when we
-                // delete a part of the vector the next part shifts left into the position of our current iterator,
+                // only increment iterator if nothing is removed from vector to avoid having the iterator shift,
+                // since when we delete a part of the vector the next part shifts left into the position of our current iterator,
                 // so incrementing after a deletion would skip the next object.
+                sndl.life -= 0.01;
+                sndl.pos.y += 4;
                 sandle_inter++;
+                // TODO: IMPLEMENT ON YOUR OWN!!! // random -1 or +1
             }
         }
 
 
         // --- Draw / Render :
 
-        // start drawing and prerequisites
+        // start drawing plus prerequisites
         BeginDrawing();
         ClearBackground(SKYBLUE);
 
