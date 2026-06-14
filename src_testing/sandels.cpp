@@ -54,15 +54,32 @@ int main()
         if (IsMouseButtonDown(MOUSE_BUTTON_LEFT))
         {
             //cout << "DEBUG: " "Mouse [X: " << mousePosition.x << ", " << "Y: " << mousePosition.y << ']' << endl; // DEBUG
-            // TODO: combine into one push_back if possible for performance maybe
-            sandels.push_back(Sandel(mousePosition));
-            sandels.push_back(Sandel({mousePosition.x - 13, mousePosition.y}));
-            sandels.push_back(Sandel({mousePosition.x + 13, mousePosition.y}));
 
+            // maps {mousePosition} directly to the struct members, being pos, then structs defaults for others.
+            // just makes a temporary Sandel object with the structs values then moves it into the vector.
+            // aggregate initialization.
+            //sandels.push_back({mousePosition});
+            // explicitly calls the constructor (which is empty/default) to map mousePosition to pos, then structs defaults for others.
+            // makes a temporary Sandel object with the structs values then moves it into the vector.
+            // explicit constructor call, just aggregate initialization since we lack a constructor.
+            //sandels.push_back(Sandel(mousePosition));
+            // the two above lines do the same thing in our circumstances and are likely compiled identically,
+            // this also applies to .insert() but not .exmplace_back(), it applies anywhere where a Sandel object is created.
+            // on the line above the compiler automatically deduces the type Sandel because .push_back() expects the type Sandel
+            // since it is writing to a vector constructed of the type Sandel.
+
+            // combined three .push_back() calls into one .insert() call.
+            // .insert() lets you insert multiple elements at once, it also allows for insertion anywhere in the vector.
+            // we insert at the end with the position 'sandels.end()', but it is slower than .push_back() if inserting elsewhere than the end
+            // since then the vectors elements must shift, with 'sandels.end()' the elements just get appended.
+            sandels.insert(sandels.end(), {{mousePosition}, {mousePosition.x - 13, mousePosition.y}, {mousePosition.x + 13, mousePosition.y}});
+
+            // TODO: explore .emplace_back() tomorrow for possible performance increase
         }
 
-        for (size_t sandle_inter = 0; sandle_inter < sandels.size();) // direct reference with '&', Sandel& and &sndl have same effect
+        for (size_t sandle_inter = 0; sandle_inter < sandels.size();)
         {
+            // direct reference to memory with '&', Sandel& and &sndl have same effect
             Sandel &sndl = sandels[sandle_inter];
             //cout << "DEBUG: " "[Iteration: " << sandle_inter << ", X: " << sndl.pos.x << ", Y: " << sndl.pos.y << ", Life: " << sndl.life << ']' << endl; // DEBUG
                 if (sndl.life <= 0.0001f)
