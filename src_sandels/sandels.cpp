@@ -8,7 +8,7 @@
 #include <iostream>
 #include <vector>
 #include  "raylib.h"
-// #include "sandels.h"
+//#include "sandels.h"
 
 using namespace std;
 
@@ -39,15 +39,17 @@ int main()
 
     // Pre-Main Loop / One-Time Code :
 
+    // create sandels vector of type Sandel
     vector<Sandel> sandels;
+    // reserve space for 1024 elements
     sandels.reserve(1024);
-
-    // TODO: IMPLEMENT ON YOUR OWN!!! // seed random number generator
 
     // main game loop
     while (!WindowShouldClose())
     {
         // --- Update / Simulation :
+
+        // spawn sandels
 
         Vector2 mousePosition = GetMousePosition();
 
@@ -104,32 +106,55 @@ int main()
             // approaches act a lot different from what you expect, they are all very optimised
         }
 
-        for (size_t sandle_inter = 0; sandle_inter < sandels.size();)
+        // delete sandels
+        // TODO: make const? research benefit.
+        erase_if(sandels, [](Sandel& sndl){return (sndl.life <= 0.0001f);});
+
+        // update sandels
+        for (Sandel& sndl: sandels)
         {
-            // direct reference to memory with '&', Sandel& and &sndl have same effect
-            Sandel &sndl = sandels[sandle_inter];
-            //cout << "DEBUG: " "[Iteration: " << sandle_inter << ", X: " << sndl.pos.x << ", Y: " << sndl.pos.y << ", Life: " << sndl.life << ']' << endl; // DEBUG
-                if (sndl.life <= 0.0001f)
-            {
-                // TODO: optimise deletion logic using O(N) instead of O(N²)
-                // TODO: (currently everything inside the vector is shifted during deletion which is very a heavy operation)
-                sandels.erase(sandels.begin() + sandle_inter); // weird accurate ig
-                // line above deletes the sandel with 0 life left,
-                // lines under delete the first sandel created when any sandel reaches 0 life,
-                // making the above line more accurate if sandel life and spawn order
-                // stops being the same, since now oldest sandel has the least health
-                //sandels.erase(sandels.begin()); // weird simpler faster
-                //sandels.erase(begin(sandels)); // same weird simple fast, whats diff
-            } else {
-                // only increment iterator if nothing is removed from vector to avoid having the iterator shift,
-                // since when we delete a part of the vector the next part shifts left into the position of our current iterator,
-                // so incrementing after a deletion would skip the next object.
-                sndl.life -= 0.01;
-                sndl.pos.y += 4;
-                sandle_inter++;
-                // TODO: IMPLEMENT ON YOUR OWN!!! // random -1 or +1
-            }
+            sndl.life -= 0.004;
+            sndl.pos.y += 4;
+            // no need to seed with srand(time(nullptr)); since its seeded in raylibs rcore.c
+            sndl.pos.x += (((rand() % 2) * 2 - 1) * 0.7f); // pseudo random -0.7 or +0.7
+            //cout << (((rand() % 2) * 2 - 1) * 0.7f) << endl; // DEBUG
+            //cout << typeid((((rand() % 2) * 2 - 1) * 0.7f)).name() << endl; // DEBUG
+            //cout << rand() << endl; // DEBUG
         }
+
+        // // legacy, move and delete sandels
+        // for (size_t sandle_inter = 0; sandle_inter < sandels.size();)
+        // {
+        //     // direct reference to memory with '&', Sandel& and &sndl have same effect
+        //     Sandel &sndl = sandels[sandle_inter];
+        //     //cout << "DEBUG: " "[Iteration: " << sandle_inter << ", X: " << sndl.pos.x << ", Y: " << sndl.pos.y << ", Life: " << sndl.life << ']' << endl; // DEBUG
+        //         if (sndl.life <= 0.0001f)
+        //     {
+        //         // TOD?: optimise deletion logic using O(N) instead of O(N²)
+        //         // TOD?: (currently everything inside the vector is shifted during deletion which is very a heavy operation)
+        //         // std::erase_if(container, predicate) - ?
+        //
+        //
+        //         sandels.erase(sandels.begin() + sandle_inter); // weird accurate ig
+        //         // line above deletes the sandel with 0 life left,
+        //         // the issue is when deleting the first / starting object in a vector,
+        //         // every single object after it, which is pretty much every single object
+        //         // has to shift left which is a big and heavy operation, it is moving
+        //         // hundreds possibly thousands of elements even if its just a shift by one.
+        //         // lines under delete the first sandel created when any sandel reaches 0 life,
+        //         // making the above line more accurate if sandel life and spawn order
+        //         // stops being the same, since now oldest sandel has the least health.
+        //         //sandels.erase(sandels.begin()); // weird simpler faster
+        //         //sandels.erase(begin(sandels)); // same weird simple fast, whats diff
+        //     } else {
+        //         // only increment iterator if nothing is removed from vector to avoid having the iterator shift,
+        //         // since when we delete a part of the vector the next part shifts left into the position of our current iterator,
+        //         // so incrementing after a deletion would skip the next object.
+        //     sndl.life -= 0.004;
+        //     sndl.pos.y += 4;
+        //     sandle_inter++;
+        //     }
+        // }
 
 
         // --- Draw / Render :
