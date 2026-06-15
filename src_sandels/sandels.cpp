@@ -3,7 +3,7 @@
 //
 
 
-// Preprocessing :
+// Pre-processing :
 
 #include <iostream>
 #include <vector>
@@ -107,15 +107,15 @@ int main()
         }
 
         // delete sandels
-        // TODO: make const? research benefit.
-        erase_if(sandels, [](Sandel& sndl){return (sndl.life <= 0.0001f);});
+        // 'const' makes it so the Sandel object sndl references cannot be modified through sndl, (constant reference), standard practice.
+        erase_if(sandels, [](const Sandel& sndl){return (sndl.life <= 0.0001f);});
 
         // update sandels
         for (Sandel& sndl: sandels)
         {
             sndl.life -= 0.004;
             sndl.pos.y += 4;
-            // no need to seed with srand(time(nullptr)); since its seeded in raylibs rcore.c
+            // no need to seed with 'srand(time(nullptr));' since its seeded in raylibs rcore.c
             sndl.pos.x += (((rand() % 2) * 2 - 1) * 0.7f); // pseudo random -0.7 or +0.7
             //cout << (((rand() % 2) * 2 - 1) * 0.7f) << endl; // DEBUG
             //cout << typeid((((rand() % 2) * 2 - 1) * 0.7f)).name() << endl; // DEBUG
