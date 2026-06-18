@@ -122,6 +122,7 @@ int main()
 
         // loop variables
         int sndliter = 0;
+        int sndltwoiter = 0;
 
         // update loop
         for (Sandel& sndl: sandels)
@@ -130,22 +131,20 @@ int main()
 
             // sandel to sandel collision
             // i am going to attempt to do this on my own but i think it will be extremely slow
-            // when i was experimenting with the collision logic trying to make it work i made a change that had no big
-            // difference but it did increase performance, when idle it would be lower but when all sandels were spawned
-            // the fps cap would be hit, i need to check this later i saved it in
-            // src_testing/flawedsandelcollisonlogichasmoreefficientspawninglogic.cpp, what a descriptive name.
+            //CheckCollisionCircles(sndl.pos, 2.6f, ,2.6f);
 
             // iterate through each sandel again and if it isnt our original sandel check if the next vertical position after gravity
             // is applied results in collision and if it does dont move down.
-            int sndltwoiter = 0; // clear iterator before next iteration loop
-            for (const Sandel& sndltwo: sandels) { // direct reference no copy, uneditable by const
+            for (Sandel sndltwo: sandels)
+            {
                 // make sure current sandel will not collide if moved down by gravity
-                if (sndliter != sndltwoiter and !CheckCollisionCircles({sndl.pos.x + 4.0f, sndl.pos.y}, 2.6f, sndltwo.pos,2.6f))
+                if (sndliter != sndltwoiter and !CheckCollisionCircles({sndl.pos.x, sndl.pos.y}, 2.6f, sndltwo.pos,2.6f))
                 {
                     // gravity, move down
-                    sndl.pos.y += 4.0f;
+                    sndl.pos.y += 4;
+
+                    sndltwoiter++; // increment comparison iterator
                 }
-                sndltwoiter++; // increment comparison iterator
             }
 
             // // pseudo random left or right movement
@@ -156,7 +155,7 @@ int main()
             // //cout << rand() << endl; // DEBUG
 
             // clamp sandels to window boundries
-            sndl.pos = Vector2Clamp(sndl.pos, {0.0f, 0.0f}, {1920.0f, 1080.0f}); // probably unoptimal
+            sndl.pos = Vector2Clamp(sndl.pos, {0, 0}, {1920, 1080}); // probably unoptimal
 
             sndliter++; // increment comparison iterator
         }
