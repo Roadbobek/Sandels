@@ -17,9 +17,8 @@ using namespace std;
 // Globals and Declarations :
 
 struct Sandel
-{ // '{}' automatically assigns default empty values
+{ // '{}', automatically assign default empty values
     Vector2 pos {};
-    float velocity {1.0f};
     float life {1.0f};
 };
 
@@ -36,7 +35,7 @@ int main()
 
     InitWindow(1920, 1080, "Sandels");
     //HideCursor();
-    SetTargetFPS(180); // temp until delta time
+    SetTargetFPS(180); // TODO: implement delta time
 
     // Pre-Main Loop / One-Time Code :
 
@@ -140,7 +139,10 @@ int main()
             int sndltwoiter = 0; // clear iterator before next iteration loop
             for (const Sandel& sndltwo: sandels) { // direct reference no copy, uneditable by const
                 // make sure current sandel will not collide if moved down by gravity
-                if (sndliter != sndltwoiter and !CheckCollisionCircles({sndl.pos.x + 4.0f, sndl.pos.y}, 2.6f, sndltwo.pos,2.6f))
+                // slightly smaller checking radius, TODO: test affectiveness
+                if (sndliter != sndltwoiter and Vector2{sndl.pos.x + 4.0f, sndl.pos.y} != sndltwo.pos)
+                //if (sndliter != sndltwoiter and sndl.pos.x + 4.0f != sndltwo.pos.x)
+                //if (sndliter != sndltwoiter and !CheckCollisionCircles({sndl.pos.x + 4.0f, sndl.pos.y}, 2.6f, sndltwo.pos,2.0f))
                 {
                     // gravity, move down
                     sndl.pos.y += 4.0f;
@@ -203,7 +205,7 @@ int main()
         ClearBackground(SKYBLUE);
 
         // cursor
-        DrawCircleV(mousePosition, 5, RAYWHITE);
+        DrawCircleV(mousePosition, 5.0f, RAYWHITE);
 
         // draw sandels
         for (Sandel sandel: sandels)
